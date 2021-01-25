@@ -11,12 +11,14 @@ import (
 	"strings"
 )
 
+// ok
 // IRouter defines all router handle interface includes single and group router.
 type IRouter interface {
 	IRoutes
 	Group(string, ...HandlerFunc) *RouterGroup
 }
 
+// ok
 // IRoutes defines all router handle interface.
 type IRoutes interface {
 	Use(...HandlerFunc) IRoutes
@@ -36,6 +38,7 @@ type IRoutes interface {
 	StaticFS(string, http.FileSystem) IRoutes
 }
 
+// ok
 // RouterGroup is used internally to configure router, a RouterGroup is associated with
 // a prefix and an array of handlers (middleware).
 type RouterGroup struct {
@@ -47,32 +50,40 @@ type RouterGroup struct {
 
 var _ IRouter = &RouterGroup{}
 
+// ok
+// 添加middleware進入某個RouteGroup`
 // Use adds middleware to the group, see example code in GitHub.
 func (group *RouterGroup) Use(middleware ...HandlerFunc) IRoutes {
 	group.Handlers = append(group.Handlers, middleware...)
 	return group.returnObj()
 }
 
+// ok
+// 創建新的路由組，並且把相同的middleware以及prefix移植過去。
 // Group creates a new router group. You should add all the routes that have common middlewares or the same path prefix.
 // For example, all the routes that use a common middleware for authorization could be grouped.
 func (group *RouterGroup) Group(relativePath string, handlers ...HandlerFunc) *RouterGroup {
 	return &RouterGroup{
-		Handlers: group.combineHandlers(handlers),
-		basePath: group.calculateAbsolutePath(relativePath),
-		engine:   group.engine,
+		Handlers: group.combineHandlers(handlers),           // middleware合併
+		basePath: group.calculateAbsolutePath(relativePath), // 路徑處理
+		engine:   group.engine,                              // 使用相同引擎
 	}
 }
 
+// ok
+// 回傳basePath
 // BasePath returns the base path of router group.
 // For example, if v := router.Group("/rest/n/v1/api"), v.BasePath() is "/rest/n/v1/api".
 func (group *RouterGroup) BasePath() string {
 	return group.basePath
 }
 
+// ok
+// 確定method, path, handlers之後調用
 func (group *RouterGroup) handle(httpMethod, relativePath string, handlers HandlersChain) IRoutes {
 	absolutePath := group.calculateAbsolutePath(relativePath)
 	handlers = group.combineHandlers(handlers)
-	group.engine.addRoute(httpMethod, absolutePath, handlers)
+	group.engine.addRoute(httpMethod, absolutePath, handlers) // 有了method, path, Handlers，就可以將新的route註冊
 	return group.returnObj()
 }
 
@@ -93,41 +104,49 @@ func (group *RouterGroup) Handle(httpMethod, relativePath string, handlers ...Ha
 	return group.handle(httpMethod, relativePath, handlers)
 }
 
+// ok
 // POST is a shortcut for router.Handle("POST", path, handle).
 func (group *RouterGroup) POST(relativePath string, handlers ...HandlerFunc) IRoutes {
 	return group.handle(http.MethodPost, relativePath, handlers)
 }
 
+// ok
 // GET is a shortcut for router.Handle("GET", path, handle).
 func (group *RouterGroup) GET(relativePath string, handlers ...HandlerFunc) IRoutes {
 	return group.handle(http.MethodGet, relativePath, handlers)
 }
 
+// ok
 // DELETE is a shortcut for router.Handle("DELETE", path, handle).
 func (group *RouterGroup) DELETE(relativePath string, handlers ...HandlerFunc) IRoutes {
 	return group.handle(http.MethodDelete, relativePath, handlers)
 }
 
+// ok
 // PATCH is a shortcut for router.Handle("PATCH", path, handle).
 func (group *RouterGroup) PATCH(relativePath string, handlers ...HandlerFunc) IRoutes {
 	return group.handle(http.MethodPatch, relativePath, handlers)
 }
 
+// ok
 // PUT is a shortcut for router.Handle("PUT", path, handle).
 func (group *RouterGroup) PUT(relativePath string, handlers ...HandlerFunc) IRoutes {
 	return group.handle(http.MethodPut, relativePath, handlers)
 }
 
+// ok
 // OPTIONS is a shortcut for router.Handle("OPTIONS", path, handle).
 func (group *RouterGroup) OPTIONS(relativePath string, handlers ...HandlerFunc) IRoutes {
 	return group.handle(http.MethodOptions, relativePath, handlers)
 }
 
+// ok
 // HEAD is a shortcut for router.Handle("HEAD", path, handle).
 func (group *RouterGroup) HEAD(relativePath string, handlers ...HandlerFunc) IRoutes {
 	return group.handle(http.MethodHead, relativePath, handlers)
 }
 
+// ok
 // Any registers a route that matches all the HTTP methods.
 // GET, POST, PUT, PATCH, HEAD, OPTIONS, DELETE, CONNECT, TRACE.
 func (group *RouterGroup) Any(relativePath string, handlers ...HandlerFunc) IRoutes {

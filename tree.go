@@ -55,6 +55,7 @@ type methodTree struct {
 
 type methodTrees []methodTree
 
+// 獲得指定method tree的root
 func (trees methodTrees) get(method string) *node {
 	for _, tree := range trees {
 		if tree.method == method {

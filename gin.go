@@ -61,6 +61,7 @@ type Engine struct {
 	// For example if /foo/ is requested but a route only exists for /foo, the
 	// client is redirected to /foo with http status code 301 for GET requests
 	// and 307 for all other request methods.
+	// 開啟自動重新導向，
 	RedirectTrailingSlash bool
 
 	// If enabled, the router tries to fix the current request path, if no
